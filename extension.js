@@ -227,15 +227,16 @@ class ClaudeIndicator extends PanelMenu.Button {
 
         if (!this._alive) return;  // extension disabled while request was in flight
 
+        if (!usage) {
+            this._lastUpdateItem.label.set_text(
+                `Dernière MAJ : erreur réseau (${new Date().toLocaleTimeString('fr-FR')})`
+            );
+            return;
+        }
+
         this._lastUpdateItem.label.set_text(
             `Dernière MAJ : ${new Date().toLocaleTimeString('fr-FR')}`
         );
-
-        if (!usage) {
-            this._label.set_text('Claude ⚠');
-            this._sessionItem.label.set_text('Session 5h : erreur réseau');
-            return;
-        }
 
         const five = usage.five_hour ?? {};
         const week = usage.seven_day ?? {};
