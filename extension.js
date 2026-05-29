@@ -1,4 +1,5 @@
 import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
 import Gio from 'gi://Gio';
 import Soup from 'gi://Soup';
 import St from 'gi://St';
@@ -11,13 +12,22 @@ import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 const CREDENTIALS_PATH = `${GLib.get_home_dir()}/.claude/.credentials.json`;
 const USAGE_API    = 'https://api.anthropic.com/api/oauth/usage';
 const REFRESH_API  = 'https://claude.ai/api/auth/token';
-const POLL_SECONDS = 120;
+
+const INTERVALS = [
+    { label: 'Manuel',      seconds: null },
+    { label: '30 secondes', seconds: 30   },
+    { label: '1 minute',    seconds: 60   },
+    { label: '2 minutes',   seconds: 120  },
+    { label: '5 minutes',   seconds: 300  },
+    { label: '10 minutes',  seconds: 600  },
+];
+const DEFAULT_POLL_SECONDS = 120;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default class ClaudeUsageExtension extends Extension {
     enable() {
-        this._indicator = new ClaudeIndicator();
+        this._indicator = new ClaudeIndicator(this.path);
         Main.panel.addToStatusArea(this.uuid, this._indicator);
     }
 
@@ -29,16 +39,27 @@ export default class ClaudeUsageExtension extends Extension {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+const ClaudeIndicator = GObject.registerClass(
 class ClaudeIndicator extends PanelMenu.Button {
-    constructor() {
-        super(0.0, 'Claude Usage Indicator', false);
+    _init(extensionPath) {
+        super._init(0.0, 'Claude Usage Indicator', false);
 
         this._alive       = true;
         this._pollSource  = null;
+        this._pollSeconds = DEFAULT_POLL_SECONDS;
         this._httpSession = new Soup.Session();
 
         // ── Panel widget ──────────────────────────────────────────────
         const box = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
+
+        const iconFile = Gio.File.new_for_path(`${extensionPath}/claude-logo.png`);
+        const icon = new St.Icon({
+            gicon: new Gio.FileIcon({ file: iconFile }),
+            icon_size: 16,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        box.add_child(icon);
+
         this._label = new St.Label({
             text: 'Claude …',
             y_align: Clutter.ActorAlign.CENTER,
@@ -59,6 +80,19 @@ class ClaudeIndicator extends PanelMenu.Button {
         const refreshItem = new PopupMenu.PopupMenuItem('Rafraîchir');
         refreshItem.connect('activate', () => this._poll().catch(logError));
         this.menu.addMenuItem(refreshItem);
+
+        const intervalMenu = new PopupMenu.PopupSubMenuMenuItem('Intervalle : 2 minutes');
+        this._intervalMenuLabel = intervalMenu.label;
+        this._intervalItems = [];
+        for (const { label, seconds } of INTERVALS) {
+            const item = new PopupMenu.PopupMenuItem(
+                (seconds === this._pollSeconds ? '✓ ' : '    ') + label
+            );
+            item.connect('activate', () => this._setInterval(seconds, label, item));
+            intervalMenu.menu.addMenuItem(item);
+            this._intervalItems.push({ item, label, seconds });
+        }
+        this.menu.addMenuItem(intervalMenu);
 
         this._startPolling();
     }
@@ -99,7 +133,7 @@ class ClaudeIndicator extends PanelMenu.Button {
             this._httpSession.send_and_read_async(msg, GLib.PRIORITY_DEFAULT, null, (session, res) => {
                 try {
                     const bytes = session.send_and_read_finish(res);
-                    resolve({ status: msg.get_status(), bytes });
+                    resolve({ status: msg.status_code, bytes });
                 } catch (e) {
                     reject(e);
                 }
@@ -202,9 +236,29 @@ class ClaudeIndicator extends PanelMenu.Button {
 
     // ── Lifecycle ─────────────────────────────────────────────────────
 
+    _setInterval(seconds, label, selectedItem) {
+        this._pollSeconds = seconds;
+
+        for (const { item, label: lbl } of this._intervalItems)
+            item.label.set_text((item === selectedItem ? '✓ ' : '    ') + lbl);
+
+        this._intervalMenuLabel.set_text(`Intervalle : ${label}`);
+
+        if (this._pollSource !== null) {
+            GLib.source_remove(this._pollSource);
+            this._pollSource = null;
+        }
+        if (seconds !== null) {
+            this._pollSource = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, seconds, () => {
+                this._poll().catch(logError);
+                return GLib.SOURCE_CONTINUE;
+            });
+        }
+    }
+
     _startPolling() {
         this._poll().catch(logError);
-        this._pollSource = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, POLL_SECONDS, () => {
+        this._pollSource = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, this._pollSeconds, () => {
             this._poll().catch(logError);
             return GLib.SOURCE_CONTINUE;
         });
@@ -219,4 +273,4 @@ class ClaudeIndicator extends PanelMenu.Button {
         this._httpSession.abort();
         super.destroy();
     }
-}
+});

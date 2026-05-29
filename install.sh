@@ -11,7 +11,11 @@ mkdir -p "${INSTALL_DIR}"
 cp "${SCRIPT_DIR}/metadata.json" \
    "${SCRIPT_DIR}/extension.js"  \
    "${SCRIPT_DIR}/stylesheet.css" \
+   "${SCRIPT_DIR}/claude-logo.png" \
    "${INSTALL_DIR}/"
+
+# icon.png est la convention GNOME Extensions pour l'icône affichée dans la liste
+cp "${SCRIPT_DIR}/ubuntu-claude-code-indicator.png" "${INSTALL_DIR}/icon.png"
 
 echo "==> Activation de l'extension"
 gnome-extensions enable "${UUID}" 2>/dev/null || true
