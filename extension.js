@@ -27,7 +27,7 @@ const DEFAULT_POLL_SECONDS = 120;
 
 export default class ClaudeUsageExtension extends Extension {
     enable() {
-        this._indicator = new ClaudeIndicator(this.path);
+        this._indicator = new ClaudeIndicator(this.path, this.uuid);
         Main.panel.addToStatusArea(this.uuid, this._indicator);
     }
 
@@ -41,10 +41,11 @@ export default class ClaudeUsageExtension extends Extension {
 
 const ClaudeIndicator = GObject.registerClass(
 class ClaudeIndicator extends PanelMenu.Button {
-    _init(extensionPath) {
+    _init(extensionPath, uuid) {
         super._init(0.0, 'Claude Usage Indicator', false);
 
         this._alive       = true;
+        this._uuid        = uuid;
         this._pollSource  = null;
         this._pollSeconds = DEFAULT_POLL_SECONDS;
         this._httpSession = new Soup.Session();
@@ -93,6 +94,21 @@ class ClaudeIndicator extends PanelMenu.Button {
             this._intervalItems.push({ item, label, seconds });
         }
         this.menu.addMenuItem(intervalMenu);
+
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        const quitItem = new PopupMenu.PopupMenuItem('Quitter l\'indicateur');
+        quitItem.connect('activate', () => {
+            try {
+                const proc = new Gio.Subprocess({
+                    argv: ['gnome-extensions', 'disable', this._uuid],
+                    flags: Gio.SubprocessFlags.NONE,
+                });
+                proc.init(null);
+            } catch (e) {
+                logError(e);
+            }
+        });
+        this.menu.addMenuItem(quitItem);
 
         this._startPolling();
     }
