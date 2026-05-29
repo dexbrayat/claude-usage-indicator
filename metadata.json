@@ -1,0 +1,8 @@
+{
+  "id": "claude-usage-indicator@kiboko.fr",
+  "name": "Claude Usage Indicator",
+  "description": "Displays Claude.ai usage (5h session, 7-day) in the GNOME Shell topbar.",
+  "version": 1,
+  "shell-version": ["45", "46", "47"],
+  "url": "https://github.com/kiboko/claude-usage-indicator"
+}

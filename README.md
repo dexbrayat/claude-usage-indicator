@@ -1,13 +1,12 @@
 # claude-usage-indicator
 
-Indicateur d'utilisation Claude.ai dans la topbar GNOME (Wayland, Ubuntu 24.04).
+Extension GNOME Shell native affichant l'utilisation Claude.ai dans la topbar.
 
-Affiche en temps réel la consommation de tokens : session 5h, hebdomadaire et routines.
+Affiche en temps réel : session 5h (%), 7 jours (%), timer avant reset.
 
 ## Prérequis
 
-- Ubuntu 24.04, GNOME Shell avec l'extension [AppIndicator](https://extensions.gnome.org/extension/615/appindicator-support/)
-- Python 3.12
+- GNOME Shell 45, 46 ou 47 (Ubuntu 24.04 → GNOME 46)
 - Compte Claude.ai connecté via Claude Code (`~/.claude/.credentials.json` présent)
 
 ## Installation
@@ -16,24 +15,31 @@ Affiche en temps réel la consommation de tokens : session 5h, hebdomadaire et r
 bash install.sh
 ```
 
-Le script installe les dépendances système, copie le binaire dans `/usr/local/bin/` et active le service systemd user.
+Puis **déconnectez-vous et reconnectez-vous** (requis sous Wayland — GNOME Shell
+ne peut pas être rechargé à chaud).
 
-## Utilisation
+## Désinstallation
 
 ```bash
-# Logs en direct
-journalctl --user -u claude-usage-indicator.service -f
+gnome-extensions disable claude-usage-indicator@kiboko.fr
+rm -rf ~/.local/share/gnome-shell/extensions/claude-usage-indicator@kiboko.fr
+```
 
-# Lancer manuellement pour déboguer
-CLAUDE_INDICATOR_DEBUG=1 python3 claude_usage_indicator.py
+## Débogage
 
-# Redémarrer après mise à jour du script
-sudo install -m 755 claude_usage_indicator.py /usr/local/bin/claude-usage-indicator
-systemctl --user restart claude-usage-indicator.service
+```bash
+# Logs de l'extension en direct
+journalctl -f /usr/bin/gnome-shell --output cat | grep claude-usage
+
+# Statut de l'extension
+gnome-extensions info claude-usage-indicator@kiboko.fr
+
+# Vérifier les erreurs JS dans Looking Glass
+# Alt+F2 → lg → onglet Errors  (X11 uniquement)
 ```
 
 ## Fonctionnement
 
-- Poll `https://api.anthropic.com/api/oauth/usage` toutes les 120 secondes
+- Poll `https://api.anthropic.com/api/oauth/usage` toutes les 120 secondes via `Soup.Session`
 - Token OAuth lu dans `~/.claude/.credentials.json` (clé `claudeAiOauth.accessToken`)
-- Refresh automatique du token en cas d'expiration
+- Refresh automatique du token si `expiresAt` dépassé
