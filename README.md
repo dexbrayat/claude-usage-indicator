@@ -4,6 +4,8 @@ Extension GNOME Shell native affichant l'utilisation Claude.ai dans la topbar.
 
 Affiche en temps réel : session 5h (%), 7 jours (%), timer avant reset.
 
+![Menu topbar déroulé](screenshot-claude-code-indicator.png)
+
 ## Prérequis
 
 - GNOME Shell 45, 46 ou 47 (Ubuntu 24.04 → GNOME 46)
