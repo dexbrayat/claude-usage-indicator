@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(systemctl:*)",
+      "Bash(journalctl:*)",
+      "Bash(apt-get:*)",
+      "Bash(pip3:*)",
+      "Bash(install:*)"
+    ]
+  }
+}

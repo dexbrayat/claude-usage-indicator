@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+.idea/
+
+# Paramètres locaux Claude Code (propres à chaque poste)
+.claude/settings.local.json
+settings.local.json
