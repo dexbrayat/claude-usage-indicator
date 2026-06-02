@@ -76,6 +76,12 @@ class ClaudeIndicator extends PanelMenu.Button {
         this._weeklyItem     = this._menuItem('7 jours : …');
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this._lastUpdateItem = this._menuItem('Dernière MAJ : jamais');
+
+        const usageLinkItem = new PopupMenu.PopupMenuItem('Voir l\'utilisation sur claude.ai');
+        usageLinkItem.connect('activate', () => {
+            Gio.AppInfo.launch_default_for_uri('https://claude.ai/new#settings/usage', null);
+        });
+        this.menu.addMenuItem(usageLinkItem);
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
         const refreshItem = new PopupMenu.PopupMenuItem('Rafraîchir');
