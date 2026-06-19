@@ -20,6 +20,14 @@ bash install.sh
 Puis **déconnectez-vous et reconnectez-vous** (requis sous Wayland — GNOME Shell
 ne peut pas être rechargé à chaud).
 
+## Mise à jour
+
+```bash
+bash update.sh
+```
+
+Puis **déconnectez-vous et reconnectez-vous**.
+
 ## Désinstallation
 
 ```bash
@@ -45,3 +53,7 @@ gnome-extensions info claude-usage-indicator@exbrayat.net
 - Poll `https://api.anthropic.com/api/oauth/usage` toutes les 120 secondes via `Soup.Session`
 - Token OAuth lu dans `~/.claude/.credentials.json` (clé `claudeAiOauth.accessToken`)
 - Refresh automatique du token si `expiresAt` dépassé
+
+## Source
+
+https://codeberg.org/dexbrayat/claude-usage-indicator
