@@ -23,8 +23,8 @@ ne peut pas être rechargé à chaud).
 ## Désinstallation
 
 ```bash
-gnome-extensions disable claude-usage-indicator@kiboko.fr
-rm -rf ~/.local/share/gnome-shell/extensions/claude-usage-indicator@kiboko.fr
+gnome-extensions disable claude-usage-indicator@exbrayat.net
+rm -rf ~/.local/share/gnome-shell/extensions/claude-usage-indicator@exbrayat.net
 ```
 
 ## Débogage
@@ -34,7 +34,7 @@ rm -rf ~/.local/share/gnome-shell/extensions/claude-usage-indicator@kiboko.fr
 journalctl -f /usr/bin/gnome-shell --output cat | grep claude-usage
 
 # Statut de l'extension
-gnome-extensions info claude-usage-indicator@kiboko.fr
+gnome-extensions info claude-usage-indicator@exbrayat.net
 
 # Vérifier les erreurs JS dans Looking Glass
 # Alt+F2 → lg → onglet Errors  (X11 uniquement)

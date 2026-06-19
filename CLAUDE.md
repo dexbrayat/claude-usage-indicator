@@ -22,14 +22,14 @@ bash install.sh
 
 # Mettre à jour l'extension après modification
 cp extension.js stylesheet.css \
-   ~/.local/share/gnome-shell/extensions/claude-usage-indicator@kiboko.fr/
+   ~/.local/share/gnome-shell/extensions/claude-usage-indicator@exbrayat.net/
 # Puis déconnexion/reconnexion
 
 # Logs de l'extension en direct
 journalctl -f /usr/bin/gnome-shell --output cat | grep claude-usage
 
 # Statut
-gnome-extensions info claude-usage-indicator@kiboko.fr
+gnome-extensions info claude-usage-indicator@exbrayat.net
 ```
 
 ## Architecture
@@ -61,4 +61,4 @@ Tout le code est dans `extension.js` — deux classes :
 
 ## Déploiement
 
-L'UUID de l'extension est `claude-usage-indicator@kiboko.fr`. Le répertoire d'installation cible est `~/.local/share/gnome-shell/extensions/claude-usage-indicator@kiboko.fr/`. Sous Wayland, un rechargement à chaud de GNOME Shell est impossible — une déconnexion/reconnexion est requise après toute modification.
+L'UUID de l'extension est `claude-usage-indicator@exbrayat.net`. Le répertoire d'installation cible est `~/.local/share/gnome-shell/extensions/claude-usage-indicator@exbrayat.net/`. Sous Wayland, un rechargement à chaud de GNOME Shell est impossible — une déconnexion/reconnexion est requise après toute modification.

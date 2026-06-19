@@ -1,5 +1,5 @@
 {
-  "uuid": "claude-usage-indicator@kiboko.fr",
+  "uuid": "claude-usage-indicator@exbrayat.net",
   "name": "Claude Usage Indicator",
   "description": "Displays Claude.ai usage (5h session, 7-day) in the GNOME Shell topbar.",
   "version": 1,
